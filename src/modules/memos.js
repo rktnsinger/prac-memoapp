@@ -1,51 +1,98 @@
-const SET_INITIAL_MEMOS = "memo/SET_INITIAL_MEMOS"
-const ADD_MEMO = "memo/ADD_MEMO";
-const DELETE_MEMO = "memo/DELETE_MEMO";
+import { ref, set, get, onValue, increment, update } from "firebase/database"
+import { database } from "../firebase/firebaseConfig";
 
-let nextMemoId = 0;
+const SUBSCRIBE_MEMOS = "SUBSCRIBE_MEMOS";
+const SUBSCRIBE_MEMOS_SUCCESS = "SUBSCRIBE_MEMOS_SUCCESS";
+const SUBSCRIBE_MEMOS_FAIL = "SUBSCRIBE_MEMOS_FAIL"
+
+const ADD_MEMO = "ADD_MEMO";
+const ADD_MEMO_SUCCESS = "ADD_MEMO_SUCCESS";
+const ADD_MEMO_FAIL = "ADD_MEMO_FAIL";
+
+const DELETE = {
+  REQUEST: "DELETE_MEMO_REQUEST",
+  SUCCESS: "DELETE_MEMO_SUCCESS",
+  FAIL: "DELETE_MEMO_FAIL"
+}
+
+export function subscribeMemos() {
+  return (dispatch) => {
+    dispatch({ type: SUBSCRIBE_MEMOS });
+
+    try {
+      const memosRef = ref(database, "memos");
+
+      onValue(memosRef, (snapshot) => {
+        const memos = snapshot.val();
+
+        dispatch({ type: SUBSCRIBE_MEMOS_SUCCESS, memos });
+      });
+    } catch (e) {
+      dispatch({ type: SUBSCRIBE_MEMOS_FAIL, isError: true });
+    }
+  }
+}
+
 export function addMemo(memo) {
-  return {
-    type: ADD_MEMO,
-    id: `memo${nextMemoId+= 1}`,
-    ...memo,
-  };
+  return (dispatch) => {
+    dispatch({ type: ADD_MEMO });
+
+    try {
+      const newIdRef = ref(database, "memos/nextMemoId");
+
+      get(newIdRef)
+        .then((snapshot) => snapshot.val())
+        .then((id) => {
+          const newMemoId = `memo${id}`
+
+          update(ref(database, "memos"),{
+            [`allIds/${id - 1}`]: newMemoId,
+            [`byId/${newMemoId}`]: { id: newMemoId, ...memo },
+            ["nextMemoId"]: increment(1)
+          });
+        });
+
+      dispatch({ type: ADD_MEMO_SUCCESS });
+    } catch (e) {
+      dispatch({ type: ADD_MEMO_FAIL });
+      console.log(e);
+    }
+  }
 }
 
-export function setInitialMemos(memos) {
-  return {
-    type: SET_INITIAL_MEMOS,
-    memos
-  };
-}
-
-const initialState = {
-  byId: {},
-  allIds: []
-};
-
-export default function reducer(state = initialState, action) {
+export default function reducer(state = {}, action) {
   switch (action.type) {
-    case SET_INITIAL_MEMOS:
+    case ADD_MEMO:
+      return {
+        isLoading: true,
+        isError: false
+      };
+    case ADD_MEMO_SUCCESS:
+      return {
+        isLoading: false,
+        isError: false
+      };
+    case ADD_MEMO_FAIL:
+      return {
+        isLoading: false,
+        isError: true
+      };
+    case SUBSCRIBE_MEMOS:
+      return {
+        isLoading: true,
+        isError: false
+      };
+    case SUBSCRIBE_MEMOS_SUCCESS:
       return {
         isLoading: false,
         isError: false,
         ...action.memos
       };
-
-    case ADD_MEMO:
+    case SUBSCRIBE_MEMOS_FAIL:
       return {
-        byId: {
-          ...state.byId,
-          [action.id]: {
-            id: action.id,
-            title: action.title,
-            body: action.body,
-            timeStamp: action.timeStamp
-          }
-        },
-        allIds: state.allIds.concat(action.id)
-      };
-
+        isLoading: false,
+        isError: true,
+      }
     default:
       return state;
   }

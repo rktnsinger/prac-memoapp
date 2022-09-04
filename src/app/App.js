@@ -1,20 +1,25 @@
 import React from "react";
 import styled from "styled-components";
 
-import Memo from "../common/pages/Memo/Memo";
+import Header from "../common/components/Header";
+import MemoPage from "../common/pages/Memo/MemoPage";
 
 const AppContainer = styled.div`
+  background-color: aliceblue;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid black;
+  padding: 30px 0 30px;
 `
 
 function App() {
   return (
-    <AppContainer>
-      <Memo />
-    </AppContainer>
+    <>
+      <Header />
+      <AppContainer>
+        <MemoPage />
+      </AppContainer>
+    </>
   );
 }
 

@@ -3,23 +3,35 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 
 const Container = styled.div`
+  background-color: antiquewhite;
+  border-radius: 20px;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid grey;
-  padding: 10px;
-  margin-top: 10px;
+  padding: 20px;
+  margin-top: 20px;
   width: 400px;
-  height: 200px;
 
   .entry-header {
+    color: brown;
+    font-size: 26px;
+    margin-bottom: 20px;
   }
 
-  .entry-main {
+  .entry-body {
+    height: 50px;
+    flex-wrap: wrap;
+    overflow-wrap: break-word;
+    /* text-overflow: ellipsis; */
   }
 
+  .entry-time {
+    align-self: flex-end;
+  }
   .entry-footer {
     align-self: flex-end;
+    margin-top: 10px;
   }
 `
 
@@ -33,11 +45,15 @@ export default function MemoListEntry({ memoId }) {
       <div className="entry-header">
         { displayedMemo.title }
       </div>
-      <div className="entry-main">
+      <div className="entry-body">
         { displayedMemo.body }
       </div>
-      <div className="entry-footer">
+      <div className="entry-time">
         { displayedMemo.timeStamp }
+      </div>
+      <div className="entry-footer">
+        <button>수정</button>
+        <button>삭제</button>
       </div>
     </Container>
   );

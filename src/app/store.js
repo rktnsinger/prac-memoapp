@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import thunk from "redux-thunk";
+// import thunk from "redux-thunk";
 import memos from "../modules/memos";
 import users from "../modules/users";
 
@@ -9,5 +9,5 @@ export const store = configureStore({
     users
   },
 
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });

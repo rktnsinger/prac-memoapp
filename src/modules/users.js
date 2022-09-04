@@ -9,27 +9,7 @@ export function addUser(user) {
   }
 }
 
-const initialState = {
-  byId: {
-    user1: {
-      id: "user1",
-      login: "tmhw",
-      name: "안형우",
-      email: "rktnsinger@gmail.com",
-      profile: ""
-    },
-    user2: {
-      id: "user2",
-      login: "soobin-c",
-      name: "이수빈",
-      email: "esoobin96@naver.com",
-      profile: ""
-    },
-  },
-  allIds: ["user1", "user2"]
-}
-
-export default function reducer(state = initialState, action) {
+export default function reducer(state = {}, action) {
   switch (action.type) {
     case ADD_USER:
       return {
