@@ -5,7 +5,7 @@ const SUBSCRIBE_MEMOS = "SUBSCRIBE_MEMOS";
 const SUBSCRIBE_MEMOS_SUCCESS = "SUBSCRIBE_MEMOS_SUCCESS";
 const SUBSCRIBE_MEMOS_FAIL = "SUBSCRIBE_MEMOS_FAIL"
 
-const ADD_MEMO = "ADD_MEMO";
+const ADD_MEMO_REQUEST = "ADD_MEMO_REQUEST";
 const ADD_MEMO_SUCCESS = "ADD_MEMO_SUCCESS";
 const ADD_MEMO_FAIL = "ADD_MEMO_FAIL";
 
@@ -35,7 +35,7 @@ export function subscribeMemos() {
 
 export function addMemo(memo) {
   return (dispatch) => {
-    dispatch({ type: ADD_MEMO });
+    dispatch({ type: ADD_MEMO_REQUEST });
 
     try {
       const newIdRef = ref(database, "memos/nextMemoId");
@@ -60,23 +60,27 @@ export function addMemo(memo) {
   }
 }
 
+export function deleteMemo(memoId) {
+  return (dispatch) => {
+    dispatch({ type: DELETE.REQUEST });
+
+    try {
+      const deleteTarget = {
+        [`allIds/${memoId.slice(4) - 1}`]: null,
+        [`byId/${memoId}`]: null
+      };
+
+      update(ref(database, "memos"), deleteTarget);
+    } catch(e) {
+      dispatch({ type: DELETE.FAIL });
+      console.log(e);
+    }
+
+  };
+}
+
 export default function reducer(state = {}, action) {
   switch (action.type) {
-    case ADD_MEMO:
-      return {
-        isLoading: true,
-        isError: false
-      };
-    case ADD_MEMO_SUCCESS:
-      return {
-        isLoading: false,
-        isError: false
-      };
-    case ADD_MEMO_FAIL:
-      return {
-        isLoading: false,
-        isError: true
-      };
     case SUBSCRIBE_MEMOS:
       return {
         isLoading: true,
@@ -93,6 +97,21 @@ export default function reducer(state = {}, action) {
         isLoading: false,
         isError: true,
       }
+    case ADD_MEMO_REQUEST:
+      return {
+        isLoading: true,
+        isError: false
+      };
+    case ADD_MEMO_SUCCESS:
+      return {
+        isLoading: false,
+        isError: false
+      };
+    case ADD_MEMO_FAIL:
+      return {
+        isLoading: false,
+        isError: true
+      };
     default:
       return state;
   }

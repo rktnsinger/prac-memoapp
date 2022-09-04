@@ -31,9 +31,9 @@ export default function MemoList() {
   return (
     <>
       {
-        memos.allIds.map((memo) => {
+        Array.from(Object.values(memos.allIds)).map((id) => {
           return (
-            <MemoListEntry key={memo} memoId={memo} />
+            <MemoListEntry key={id} memoId={id} />
           );
         })
       }
